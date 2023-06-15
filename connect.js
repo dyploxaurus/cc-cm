@@ -6,7 +6,8 @@ const connection = mysql.createConnection({
   user: 'root',
   password: 'dinosong3plets!',
   database: 'chroma_match',
-  port: '3306'
+  port: '3306',
+  insecureAuth: true
 });
 
 // Terhubung ke database
