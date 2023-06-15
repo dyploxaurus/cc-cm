@@ -1,0 +1,8 @@
+runtime: python39
+entrypoint: gunicorn -b :$PORT main:app
+
+env_variables:
+  GCP_PROJECT: ChromaMatch
+
+automatic_scaling:
+  target_cpu_utilization: 0.65
