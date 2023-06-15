@@ -87,7 +87,8 @@ import tensorflow as tf
 # Import library atau modul lain yang diperlukan
 
 # Load model machine learning
-model = tf.keras.models.load_model('')
+model = tf.keras.models.load_model('./Model.h5')
+
 
 #mendapatkan rekomendasi outfit berdasarkan warna kulit
 @app.route('/outfit-recommendation', methods=['POST'])
