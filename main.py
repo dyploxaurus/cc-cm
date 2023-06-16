@@ -31,9 +31,9 @@ def register():
         db.commit()
         cursor.close()
         
-        return jsonify({'message': 'Registrasi pengguna berhasil'})
+        return jsonify({'message': 'Registration Success'})
     except mysql.connector.Error as error:
-        return jsonify({'message': 'Registrasi pengguna gagal', 'error': str(error)})
+        return jsonify({'message': 'Registration Failed!', 'error': str(error)})
 
 
 #login pengguna
@@ -54,11 +54,11 @@ def login():
         cursor.close()
         
         if user:
-            return jsonify({'message': 'Login berhasil'})
+            return jsonify({'message': 'Login Success'})
         else:
-            return jsonify({'message': 'Login gagal'})
+            return jsonify({'message': 'Login Failed!'})
     except mysql.connector.Error as error:
-        return jsonify({'message': 'Login gagal', 'error': str(error)})
+        return jsonify({'message': 'Login Failed!', 'error': str(error)})
 
 
 #mendapatkan data jenis warna kulit
@@ -78,39 +78,44 @@ def get_skin_colors():
 
         return jsonify(skin_colors_data)
     except mysql.connector.Error as error:
-        return jsonify({'message': 'Gagal mendapatkan data jenis warna kulit', 'error': str(error)})
+        return jsonify({'message': 'Failed!', 'error': str(error)})
 
 
-# Import library atau modul yang diperlukan
+from flask import Flask, request, jsonify
+from PIL import Image
+import numpy as np
 import tensorflow as tf
-# ...
-# Import library atau modul lain yang diperlukan
 
-# Load model machine learning
 model = tf.keras.models.load_model('./Model.h5')
-
 
 #mendapatkan rekomendasi outfit berdasarkan warna kulit
 @app.route('/outfit-recommendation', methods=['POST'])
 def get_outfit_recommendation():
-    skin_color_id = request.json['skin_color_id']
+    # Menerima file gambar yang diunggah oleh pengguna
+    if 'image' not in request.files:
+        return jsonify({'message': 'No Image'})
     
+    image_file = request.files['image']
+    
+    # Membaca gambar menggunakan PIL
     try:
-        cursor = db.cursor()
-        query = "SELECT name FROM skin_colors WHERE id = %s"
-        values = (skin_color_id,)
-        cursor.execute(query, values)
-        skin_color = cursor.fetchone()[0]
-        cursor.close()
-        
-        #prediksi menggunakan model machine learning
-        # ...
-        #dengan menggunakan model machine learning
-        
-        outfit_recommendations = [{'id': 1, 'color': 'Red', 'outfit': 'Dress'}, {'id': 2, 'color': 'Blue', 'outfit': 'Jeans'}]
-        return jsonify(outfit_recommendations)
-    except mysql.connector.Error as error:
-        return jsonify({'message': 'Gagal mendapatkan rekomendasi outfit', 'error': str(error)})
+        outfit_image = Image.open(image_file)
+    except:
+        return jsonify({'message': 'Failed!'})
+    
+    # Preprocessing gambar outfit
+    outfit_image = outfit_image.resize((224, 224))
+    outfit_array = np.array(outfit_image) / 255.0
+    outfit_array = np.expand_dims(outfit_array, axis=0)
+    
+    # Prediksi menggunakan model machine learning
+    outfit_prediction = model.predict(outfit_array)
+    
+    # Decode prediksi menjadi kelas atau label yang sesuai
+    outfit_label = decode_prediction(outfit_prediction)
+    
+    outfit_recommendations = [{'id': 1, 'outfit': outfit_label}]
+    return jsonify(outfit_recommendations)
 
 
 #History
@@ -131,7 +136,7 @@ def get_prediction_history():
 
         return jsonify(prediction_history)
     except mysql.connector.Error as error:
-        return jsonify({'message': 'Gagal mendapatkan riwayat prediksi', 'error': str(error)})
+        return jsonify({'message': 'Failed!', 'error': str(error)})
 
 
 #data pengguna
@@ -154,7 +159,7 @@ def get_user():
 
         return jsonify(user_data)
     except mysql.connector.Error as error:
-        return jsonify({'message': 'Gagal mendapatkan data pengguna', 'error': str(error)})
+        return jsonify({'message': 'Failed!', 'error': str(error)})
 
 
 if __name__ == '__main__':
