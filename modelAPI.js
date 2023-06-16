@@ -1,23 +1,23 @@
-const fetch = require('node-fetch');
+const axios = require('axios');
 
 function callModelAPI(data) {
-  const apiUrl = 'https://api-model.com/predict'; // Ganti dengan URL API model.h5 terpisah
+  const apiUrl = 'https://chromamatch.up.railway.app/'; // Ganti dengan URL API model.h5 terpisah
 
-  fetch(apiUrl, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ data }), // Sesuaikan dengan format data yang dibutuhkan oleh API model.h5
-  })
-    .then(response => response.json())
-    .then(result => {
+  axios.post(apiUrl, { data }, { headers: { 'Content-Type': 'application/json' } })
+    .then(response => {
       // Tangani hasil respons dari API model.h5 di sini
-      console.log(result);
+      const result = response.data;
+      console.log('Hasil prediksi:', result);
+      // Lakukan tindakan selanjutnya dengan hasil prediksi
     })
     .catch(error => {
-      // Tangani error jika permintaan gagal
-      console.error(error);
+      if (error.response) {
+        console.error('Error respons:', error.response.data);
+      } else if (error.request) {
+        console.error('Tidak ada respons:', error.request);
+      } else {
+        console.error('Error:', error.message);
+      }
     });
 }
 

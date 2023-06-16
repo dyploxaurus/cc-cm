@@ -4,6 +4,8 @@ const express = require('express');
 const router = express.Router();
 const jsonku = require('./controller');
 const modelAPI = require('./modelAPI');
+const axios = require('axios');
+
 
 // Mengambil data history dari tabel history
 router.get('/history', (req, res) => {
