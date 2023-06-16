@@ -81,7 +81,6 @@ def get_skin_colors():
         return jsonify({'message': 'Failed!', 'error': str(error)})
 
 
-from flask import Flask, request, jsonify
 from PIL import Image
 import numpy as np
 import tensorflow as tf
